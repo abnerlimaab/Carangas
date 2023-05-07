@@ -24,24 +24,43 @@ class AddEditViewController: UIViewController {
     // MARK: - Super Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if car != nil {
+            prepareCarEdit()
+        }
     }
     
     // MARK: - IBActions
     @IBAction func addEdit(_ sender: UIButton) {
         if car == nil {
             car = Car()
-            car.name = tfName.text!
-            car.brand = tfBrand.text!
-            car.price = Double(tfPrice.text ?? "0")!
-            car.gasType = scGasType.selectedSegmentIndex
-            
+        }
+        
+        car.name = tfName.text!
+        car.brand = tfBrand.text!
+        car.price = Double(tfPrice.text ?? "0")!
+        car.gasType = scGasType.selectedSegmentIndex
+        
+        if car._id == nil {
             REST.saveCar(car: car) { success in
+                self.goBack()
+            }
+        } else {
+            REST.updateCar(car: car) { success in
                 self.goBack()
             }
         }
     }
     
     // MARK: - Methods
+    func prepareCarEdit() {
+        tfBrand.text = car.brand
+        tfName.text = car.name
+        tfPrice.text = "\(car.price)"
+        scGasType.selectedSegmentIndex = car.gasType
+        btAddEdit.setTitle("Alterar carro", for: .normal)
+    }
+    
     func goBack() {
         DispatchQueue.main.async {
             self.navigationController?.popViewController(animated: true)
